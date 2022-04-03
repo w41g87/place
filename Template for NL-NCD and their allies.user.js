@@ -54,7 +54,7 @@ if (window.top !== window.self) {
                 const overlayContext = overlayCanvas.getContext('2d');
                 
 
-                image.src = "https://cdn.jsdelivr.net/gh/w41g87/place@master/template.png";
+                image.src = "https://github.com/w41g87/place/raw/main/template.png";
                 // To not "taint" the image
                 image.crossOrigin = "Anonymous";
 
