@@ -17,7 +17,7 @@
 
 if (window.top !== window.self) {
     window.addEventListener('load', () => {
-        const warning = true; // SET THIS TO FALSE TO TURN OFF WARNING!
+        var warning = true; // PRESS SPACE TO TURN OFF WARNING!
 
         // Load the image
         const image = document.createElement("img");
@@ -94,49 +94,58 @@ if (window.top !== window.self) {
                     }
 
                     // draw on overlay
-                    overlayContext.putImageData(overlayColorData, 0, 0);                    
+                    overlayContext.putImageData(overlayColorData, 0, 0);
 
+                    const warningContext = warningCanvas.getContext('2d');
+                    var warningColorData = warningContext.createImageData(warningCanvas.width, warningCanvas.height);
+                    
                     // warning function
-                    if (warning) {
-                        const warningContext = warningCanvas.getContext('2d');
-                        var warningColorData = warningContext.createImageData(warningCanvas.width, warningCanvas.height);
-
-                        const blink = setInterval (() => {
-                            var mainCanvasColorData = mainCanvas.getContext('2d').getImageData(0, 0, mainCanvas.width, mainCanvas.height);
-                            
-                            if (red) {
-                                for (var i = 0; i < warningColorData.data.length; i+=4) {
-                                    if (templateColorData.data[i + 3] > 100) {
-                                        //console.log("step 1");
-                                        const diff = Math.pow(templateColorData.data[i] - mainCanvasColorData.data[i], 2) +
-                                                    Math.pow(templateColorData.data[i + 1] - mainCanvasColorData.data[i + 1], 2) +
-                                                    Math.pow(templateColorData.data[i + 2] - mainCanvasColorData.data[i + 2], 2);
-                                        // Too much difference - flash warning
-                                        //console.log("step 2");
-                                        if (diff > 1000) {
-                                            //console.log("diff");
-                                            warningColorData.data[i] = 255;
-                                            warningColorData.data[i + 1] = 0;
-                                            warningColorData.data[i + 2] = 0;
-                                            warningColorData.data[i + 3] = 128;
-                                        } else {
-                                            //console.log("same");
-                                            warningColorData.data[i + 3] = 0;
+                    document.body.onkeyup = ((e) => {
+                        if (e.key == " ") {
+                            warning = !warning;
+                            if (warning) {
+                                const blink = setInterval (() => {
+                                    if (!warning) clearInterval(blink);
+                                    var mainCanvasColorData = mainCanvas.getContext('2d').getImageData(0, 0, mainCanvas.width, mainCanvas.height);
+                                    
+                                    if (red) {
+                                        for (var i = 0; i < warningColorData.data.length; i+=4) {
+                                            if (templateColorData.data[i + 3] > 100) {
+                                                //console.log("step 1");
+                                                const diff = Math.pow(templateColorData.data[i] - mainCanvasColorData.data[i], 2) +
+                                                            Math.pow(templateColorData.data[i + 1] - mainCanvasColorData.data[i + 1], 2) +
+                                                            Math.pow(templateColorData.data[i + 2] - mainCanvasColorData.data[i + 2], 2);
+                                                // Too much difference - flash warning
+                                                //console.log("step 2");
+                                                if (diff > 1000) {
+                                                    //console.log("diff");
+                                                    warningColorData.data[i] = 255;
+                                                    warningColorData.data[i + 1] = 0;
+                                                    warningColorData.data[i + 2] = 0;
+                                                    warningColorData.data[i + 3] = 128;
+                                                } else {
+                                                    //console.log("same");
+                                                    warningColorData.data[i + 3] = 0;
+                                                }
+                                            } else {
+                                                warningColorData.data[i + 3] = 0;
+                                            }
                                         }
+                                        // draw on warning layer
+                                        warningContext.putImageData(warningColorData, 0, 0);
+                                        // warningContext.fillStyle = "#FF0000";
+                                        // warningContext.fillRect(100, 100, 1800, 800);
                                     } else {
-                                        warningColorData.data[i + 3] = 0;
+                                        warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
                                     }
-                                }
-                                // draw on warning layer
-                                warningContext.putImageData(warningColorData, 0, 0);
-                                // warningContext.fillStyle = "#FF0000";
-                                // warningContext.fillRect(100, 100, 1800, 800);
-                            } else {
-                                warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
+                                    red = !red;
+                                }, 2000);
                             }
-                            red = !red;
-                        }, 2000);
-                    }
+                        }
+                    });
+
+
+                    
 
                 }
                 // image.onload ends
