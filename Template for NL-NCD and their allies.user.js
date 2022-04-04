@@ -213,7 +213,16 @@ if (window.top !== window.self) {
                                     }
                                 }, 2000);
                             }
-                        } else if (e.key == "f") showWhite = !showWhite;
+                        } else if (e.key == "f") {
+                            showWhite = !showWhite;
+                            if (!warning) {
+                                if (showWhite) {
+                                    warningContext.putImageData(whiteColorData, 0, 0);
+                                } else {
+                                    warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
+                                }
+                            }
+                        }
                     });
 
 
