@@ -16,6 +16,7 @@
 if (window.top !== window.self) {
     window.addEventListener('load', () => {
         var warning = true; // PRESS SPACE TO TURN OFF WARNING!
+        var showWhite = false; // PRESS F TO FOCUS!
 
         // Load the image
         const image = document.createElement("img");
@@ -96,7 +97,21 @@ if (window.top !== window.self) {
 
                     const warningContext = warningCanvas.getContext('2d');
                     var warningColorData = warningContext.createImageData(warningCanvas.width, warningCanvas.height);
+
+                    // draw white background
+                    var whiteColorData = warningContext.createImageData(warningCanvas.width, warningCanvas.height);
                     
+                    for (var i = 0; i < warningColorData.data.length; i+=4) {
+                        if (templateColorData.data[i + 3] > 100) {
+                            whiteColorData.data[i+3] = 0;
+                        } else {
+                            whiteColorData.data[i] = 255;
+                            whiteColorData.data[i+1] = 255;
+                            whiteColorData.data[i+2] = 255;
+                            whiteColorData.data[i+3] = 255;
+                        }
+                    }
+
                     // warning function
 
                     var blinkInterval = setInterval (() => {
@@ -105,10 +120,11 @@ if (window.top !== window.self) {
                             warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
                         } else {
                             var mainCanvasColorData = mainCanvas.getContext('2d').getImageData(0, 0, mainCanvas.width, mainCanvas.height);
+                            
                         
                             if (red) {
                                 for (var i = 0; i < warningColorData.data.length; i+=4) {
-                                    if (templateColorData.data[i + 3] > 100) {
+                                    if (whiteColorData.data[i + 3] < 10) {
                                         //console.log("step 1");
                                         const diff = Math.pow(templateColorData.data[i] - mainCanvasColorData.data[i], 2) +
                                                     Math.pow(templateColorData.data[i + 1] - mainCanvasColorData.data[i + 1], 2) +
@@ -126,7 +142,12 @@ if (window.top !== window.self) {
                                             warningColorData.data[i + 3] = 0;
                                         }
                                     } else {
-                                        warningColorData.data[i + 3] = 0;
+                                        if (showWhite) {
+                                            warningColorData.data[i] = 255;
+                                            warningColorData.data[i + 1] = 255;
+                                            warningColorData.data[i + 2] = 255;
+                                            warningColorData.data[i + 3] = 255;
+                                        } else warningColorData.data[i + 3] = 0;
                                     }
                                 }
                                 // draw on warning layer
@@ -134,7 +155,8 @@ if (window.top !== window.self) {
                                 // warningContext.fillStyle = "#FF0000";
                                 // warningContext.fillRect(100, 100, 1800, 800);
                             } else {
-                                warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
+                                if (showWhite) warningContext.putImageData(whiteColorData, 0, 0);
+                                else warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
                             }
                             red = !red;
                         }
@@ -153,7 +175,7 @@ if (window.top !== window.self) {
                                     
                                         if (red) {
                                             for (var i = 0; i < warningColorData.data.length; i+=4) {
-                                                if (templateColorData.data[i + 3] > 100) {
+                                                if (whiteColorData.data[i + 3] < 10) {
                                                     //console.log("step 1");
                                                     const diff = Math.pow(templateColorData.data[i] - mainCanvasColorData.data[i], 2) +
                                                                 Math.pow(templateColorData.data[i + 1] - mainCanvasColorData.data[i + 1], 2) +
@@ -171,7 +193,12 @@ if (window.top !== window.self) {
                                                         warningColorData.data[i + 3] = 0;
                                                     }
                                                 } else {
-                                                    warningColorData.data[i + 3] = 0;
+                                                    if (showWhite) {
+                                                        warningColorData.data[i] = 255;
+                                                        warningColorData.data[i+1] = 255;
+                                                        warningColorData.data[i+2] = 255;
+                                                        warningColorData.data[i+3] = 255;
+                                                    } else warningColorData.data[i + 3] = 0;
                                                 }
                                             }
                                             // draw on warning layer
@@ -179,13 +206,14 @@ if (window.top !== window.self) {
                                             // warningContext.fillStyle = "#FF0000";
                                             // warningContext.fillRect(100, 100, 1800, 800);
                                         } else {
-                                            warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
+                                            if (showWhite) warningContext.putImageData(whiteColorData, 0, 0);
+                                            else warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
                                         }
                                         red = !red;
                                     }
                                 }, 2000);
                             }
-                        }
+                        } else if (e.key == "f") showWhite = !showWhite;
                     });
 
 
