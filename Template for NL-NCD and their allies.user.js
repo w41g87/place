@@ -11,9 +11,7 @@
 
 // If the new template is not updating, try clearing the browser cache!
 
-// Hello, I tried to do something more nuanced but discovered that
-// I wouldn't be able to load external non-image data without circumventing the
-// Content Security Policy directive. So here is a direct rip-off of osuplace's code.
+// Hello, I don't know what I am doing so spaghetti code here. Also runs very slowly.
 
 if (window.top !== window.self) {
     window.addEventListener('load', () => {
@@ -101,59 +99,90 @@ if (window.top !== window.self) {
                     
                     // warning function
 
-                    const blink = function() {
-                        
-                        var mainCanvasColorData = mainCanvas.getContext('2d').getImageData(0, 0, mainCanvas.width, mainCanvas.height);
-                        
-                        if (red) {
-                            for (var i = 0; i < warningColorData.data.length; i+=4) {
-                                if (templateColorData.data[i + 3] > 100) {
-                                    //console.log("step 1");
-                                    const diff = Math.pow(templateColorData.data[i] - mainCanvasColorData.data[i], 2) +
-                                                Math.pow(templateColorData.data[i + 1] - mainCanvasColorData.data[i + 1], 2) +
-                                                Math.pow(templateColorData.data[i + 2] - mainCanvasColorData.data[i + 2], 2);
-                                    // Too much difference - flash warning
-                                    //console.log("step 2");
-                                    if (diff > 1000) {
-                                        //console.log("diff");
-                                        warningColorData.data[i] = 255;
-                                        warningColorData.data[i + 1] = 0;
-                                        warningColorData.data[i + 2] = 0;
-                                        warningColorData.data[i + 3] = 128;
-                                    } else {
-                                        //console.log("same");
-                                        warningColorData.data[i + 3] = 0;
-                                    }
-                                } else {
-                                    warningColorData.data[i + 3] = 0;
-                                }
-                            }
-                            // draw on warning layer
-                            warningContext.putImageData(warningColorData, 0, 0);
-                            // warningContext.fillStyle = "#FF0000";
-                            // warningContext.fillRect(100, 100, 1800, 800);
-                        } else {
-                            warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
-                        }
-                        red = !red;
-                    }
-
-                    const blinkInterval = setInterval (() => {
+                    var blinkInterval = setInterval (() => {
                         if (!warning) {
                             clearInterval(blinkInterval);
                             warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
-                        } else blink;
+                        } else {
+                            var mainCanvasColorData = mainCanvas.getContext('2d').getImageData(0, 0, mainCanvas.width, mainCanvas.height);
+                        
+                            if (red) {
+                                for (var i = 0; i < warningColorData.data.length; i+=4) {
+                                    if (templateColorData.data[i + 3] > 100) {
+                                        //console.log("step 1");
+                                        const diff = Math.pow(templateColorData.data[i] - mainCanvasColorData.data[i], 2) +
+                                                    Math.pow(templateColorData.data[i + 1] - mainCanvasColorData.data[i + 1], 2) +
+                                                    Math.pow(templateColorData.data[i + 2] - mainCanvasColorData.data[i + 2], 2);
+                                        // Too much difference - flash warning
+                                        //console.log("step 2");
+                                        if (diff > 1000) {
+                                            //console.log("diff");
+                                            warningColorData.data[i] = 255;
+                                            warningColorData.data[i + 1] = 128 - diff / 1536;
+                                            warningColorData.data[i + 2] = 128 - diff / 1536;
+                                            warningColorData.data[i + 3] = 128 + diff / 1536;
+                                        } else {
+                                            //console.log("same");
+                                            warningColorData.data[i + 3] = 0;
+                                        }
+                                    } else {
+                                        warningColorData.data[i + 3] = 0;
+                                    }
+                                }
+                                // draw on warning layer
+                                warningContext.putImageData(warningColorData, 0, 0);
+                                // warningContext.fillStyle = "#FF0000";
+                                // warningContext.fillRect(100, 100, 1800, 800);
+                            } else {
+                                warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
+                            }
+                            red = !red;
+                        }
                     }, 2000);
 
                     document.body.onkeyup = ((e) => {
                         if (e.key == " ") {
                             warning = !warning;
                             if (warning) {
-                                const blinkInterval = setInterval (() => {
+                                var blinkInterval = setInterval (() => {
                                     if (!warning) {
                                         clearInterval(blinkInterval);
                                         warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
-                                    } else blink;
+                                    } else {
+                                        var mainCanvasColorData = mainCanvas.getContext('2d').getImageData(0, 0, mainCanvas.width, mainCanvas.height);
+                                    
+                                        if (red) {
+                                            for (var i = 0; i < warningColorData.data.length; i+=4) {
+                                                if (templateColorData.data[i + 3] > 100) {
+                                                    //console.log("step 1");
+                                                    const diff = Math.pow(templateColorData.data[i] - mainCanvasColorData.data[i], 2) +
+                                                                Math.pow(templateColorData.data[i + 1] - mainCanvasColorData.data[i + 1], 2) +
+                                                                Math.pow(templateColorData.data[i + 2] - mainCanvasColorData.data[i + 2], 2);
+                                                    // Too much difference - flash warning
+                                                    //console.log("step 2");
+                                                    if (diff > 1000) {
+                                                        //console.log("diff");
+                                                        warningColorData.data[i] = 255;
+                                                        warningColorData.data[i + 1] = 128 - diff / 1536;
+                                                        warningColorData.data[i + 2] = 128 - diff / 1536;
+                                                        warningColorData.data[i + 3] = 128 + diff / 1536;
+                                                    } else {
+                                                        //console.log("same");
+                                                        warningColorData.data[i + 3] = 0;
+                                                    }
+                                                } else {
+                                                    warningColorData.data[i + 3] = 0;
+                                                }
+                                            }
+                                            // draw on warning layer
+                                            warningContext.putImageData(warningColorData, 0, 0);
+                                            // warningContext.fillStyle = "#FF0000";
+                                            // warningContext.fillRect(100, 100, 1800, 800);
+                                        } else {
+                                            warningContext.clearRect(0, 0, warningCanvas.width, warningCanvas.height);
+                                        }
+                                        red = !red;
+                                    }
                                 }, 2000);
                             }
                         }
