@@ -10,8 +10,6 @@
 // @grant    GM_xmlhttpRequest
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
-// @grant        unsafeWindow
-// @connect place.pocket-sand.com
 // @icon         https://www.nato.int/nato_static_fl2014/assets/layout/favicon.ico
 // ==/UserScript==
 

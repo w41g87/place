@@ -18,11 +18,6 @@
 // @connect hot-potato.reddit.com
 // ==/UserScript==
 
-const BACKEND_URL = 'place.pocket-sand.com'
-const BACKEND_API_WS_URL = `wss://${BACKEND_URL}/api/ws`;
-const BACKEND_API_MAPS = `https://${BACKEND_URL}/maps`
-
-var socket;
 var order = undefined;
 var accessToken;
 var currentOrderCanvas = document.createElement('canvas');
@@ -127,62 +122,6 @@ let getPendingWork = (work, rgbaOrder, rgbaCanvas) => {
         accessToken = await getAccessToken();
     }, 30 * 60 * 1000)
 })();
-
-function connectSocket() {
-    Toastify({
-        text: 'Connecting to the server',
-        duration: DEFAULT_TOAST_DURATION_MS
-    }).showToast();
-
-    socket = new WebSocket(BACKEND_API_WS_URL);
-
-    socket.onopen = function () {
-        Toastify({
-            text: 'Connected to server',
-            duration: DEFAULT_TOAST_DURATION_MS
-        }).showToast();
-        socket.send(JSON.stringify({ type: 'getmap' }));
-        socket.send(JSON.stringify({ type: 'brand', brand: API_VERSION }));
-    };
-
-    socket.onmessage = async function (message) {
-        var data;
-        try {
-            data = JSON.parse(message.data);
-        } catch (e) {
-            return;
-        }
-
-        switch (data.type.toLowerCase()) {
-            case `map${API_VERSION}`:
-                Toastify({
-                    text: `Loading new botmap, reason: ${data.reason ? data.reason : 'Connected to server'}`,
-                    duration: DEFAULT_TOAST_DURATION_MS
-                }).showToast();
-                currentOrderCtx = await getCanvasFromUrl(`${BACKEND_API_MAPS}/${data.data}`, currentOrderCanvas, 0, 0, true);
-                order = getRealWork(currentOrderCtx.getImageData(0, 0, 2000, 2000).data);
-                Toastify({
-                    text: `New map loaded, ${order.length} pixels in total`,
-                    duration: DEFAULT_TOAST_DURATION_MS
-                }).showToast();
-                break;
-           case 'toast':
-               Toastify({
-                   text: `Message from server: ${data.message}`,
-                   duration: data.duration || DEFAULT_TOAST_DURATION_MS,
-                   style: data.style || {}
-               }).showToast();
-               break;
-            default:
-                if (data.type.toLowerCase().includes('map')) {
-                    Toastify({
-                        text: `You're running an incompatible version please update this tampermonkey script`,
-                        duration: DEFAULT_TOAST_DURATION_MS
-                    }).showToast();
-                }
-                break;
-        }
-    };
 
     socket.onclose = function (e) {
         Toastify({
